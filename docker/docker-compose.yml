@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  crawler:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB: kedra
+      MONGO_COLLECTION: decisions
+      DATE_FROM: "1/10/2025"
+      DATE_TO: "15/10/2025"
+      BODY_ARG: "15376"
+      OUTPUT_PATH: "data/landing/sample_docker.jsonl"
+      LOG_FILE: "logs/crawl.log"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./crawler_cache:/app/.scrapy
+    command: >
+      bash -lc "scrapy crawl search
+      -a date_from=$${DATE_FROM}
+      -a date_to=$${DATE_TO}
+      $${BODY_ARG:+-a body=$${BODY_ARG}}
+      $${Q_ARG:+-a q='$${Q_ARG}'}
+      -O $${OUTPUT_PATH}
+      -s LOG_FILE=$${LOG_FILE}"
+
+volumes:
+  mongo_data:
