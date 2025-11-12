@@ -13,7 +13,11 @@ class CrawlerItem(scrapy.Item):
     description = scrapy.Field()       # optional snippet/summary
     decision_date_raw = scrapy.Field() # raw text as seen
     decision_date = scrapy.Field()     # normalized ISO (set later if you wish)
-    body = scrapy.Field()              # e.g., 'WRC' or numeric id
+    body_id = scrapy.Field()           # e.g., numeric body id     1: "Equality Tribunal",
+                                       #                           2: "Employment Appeals Tribunal",
+                                       #                           3: "Labour Court",
+                                       #                       15376: "Workplace Relations Commission"
+    body = scrapy.Field()              # e.g., 'Workplace Relations Commission'
 
     # Source & links
     source_url = scrapy.Field()        # search-card detail link
