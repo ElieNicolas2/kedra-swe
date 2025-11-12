@@ -1,22 +1,31 @@
-version: "3.9"
-
 services:
   mongo:
-    image: mongo:6
+    image: mongo:7
+    container_name: kedra-mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: kedra
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --username root --password rootpass --eval 'db.adminCommand({ ping: 1 })' --quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
 
   crawler:
     build:
       context: ..
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     environment:
-      MONGO_URI: mongodb://mongo:27017
+      MONGO_URI: mongodb://root:rootpass@mongo:27017
       MONGO_DB: kedra
       MONGO_COLLECTION: decisions
       DATE_FROM: "1/10/2025"
