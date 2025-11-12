@@ -6,7 +6,7 @@ import os, mimetypes
 from scrapy.pipelines.files import FilesPipeline
 from scrapy.http import Request
 from crawler.utility import safe_ext_from_ct, sha256_bytes
-from datetime import datetime
+from datetime import datetime, timezone
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 
@@ -81,9 +81,9 @@ class MetadataPipeline:
             dd = item.get("decision_date")
             if isinstance(dd, str) and len(dd) >= 7:
                 part = dd[:7]
-            item["partition_date"] = part or datetime.utcnow().strftime("%Y-%m")
+            item["partition_date"] = part or datetime.now(timezone.utc).strftime("%Y-%m")
 
-        item["scraped_at"] = datetime.utcnow().isoformat(timespec="seconds") + "Z"
+        item["scraped_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds") + "Z"
 
         item.setdefault("content_types", [])
 

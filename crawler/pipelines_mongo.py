@@ -3,6 +3,9 @@ import time
 from typing import Any, Dict
 from pymongo import MongoClient, UpdateOne
 
+# collection.create_index([("body_id", 1)])
+# collection.create_index([("body", 1)])
+
 class MongoPipeline:
     def __init__(self, uri: str, db_name: str, coll_name: str):
         self.uri = uri
